@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "873002915649",
+    "project_id": "parking-map-36eb5",
+    "storage_bucket": "parking-map-36eb5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873002915649:android:cfcd5eedbe4adbedb0f3c0",
+        "android_client_info": {
+          "package_name": "com.example.easy_map"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCSsTtURRxIzIoOP6xDMMdBjQ2UHNu9RJs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
