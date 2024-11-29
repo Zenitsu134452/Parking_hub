@@ -55,7 +55,7 @@ class _ParkingSlotScreenState extends State<ParkingSlotScreen> {
   }
 
   Future<void> _fetchParkingImage() async {
-    const String imageUrl = 'https://3ceb-14-139-239-130.ngrok-free.app/parking_image'; // Replace with your Flask server URL
+    const String imageUrl = 'https://1b44-14-139-239-130.ngrok-free.app/parking_image'; // Replace with your Flask server URL
     try {
       final response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {

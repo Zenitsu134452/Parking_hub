@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'view_stream.dart';
 
 class BookingPage extends StatefulWidget {
   final String parkingSpotId;
@@ -23,8 +24,6 @@ class _BookingPageState extends State<BookingPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   DateTime? startTime;
   DateTime? endTime;
-  Timer? timer;
-  Duration? remainingTime;
 
   Future<void> _confirmBooking() async {
     if (startTime == null || endTime == null) {
@@ -57,22 +56,19 @@ class _BookingPageState extends State<BookingPage> {
         'userId': user.uid,
       });
 
-      // Start the timer for the booking
-      setState(() {
-        remainingTime = endTime!.difference(DateTime.now());
-        timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-          setState(() {
-            remainingTime = remainingTime! - const Duration(seconds: 1);
-            if (remainingTime!.inSeconds <= 0) {
-              timer.cancel();
-              remainingTime = null;
-              _handleBookingExpiry();
-            }
-          });
-        });
-      });
-
+      // Trigger the callback
       widget.onBookingConfirmed();
+
+      // Navigate to ViewStream page
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ViewStream(
+            parkingSpotId: widget.parkingSpotId,
+            spaceId: widget.spaceId,
+          ),
+        ),
+      );
     } catch (e) {
       print('Error confirming booking: $e');
       ScaffoldMessenger.of(context).showSnackBar(
@@ -81,39 +77,13 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
-  Future<void> _handleBookingExpiry() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('parking_spots')
-          .doc(widget.parkingSpotId)
-          .collection('spaces')
-          .doc(widget.spaceId)
-          .update({
-        'isAvailable': true,
-        'userId': null,
-        'reservedAt': null,
-        'endTime': null,
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Booking expired and space is now available')),
-      );
-    } catch (e) {
-      print('Error updating space after expiry: $e');
-    }
-  }
-
-  @override
-  void dispose() {
-    timer?.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor:Colors.lightBlueAccent,
-          title: Text('Book Space ${widget.spaceId}')),
+        backgroundColor: Colors.lightBlueAccent,
+        title: Text('Book Space ${widget.spaceId}'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -170,14 +140,6 @@ class _BookingPageState extends State<BookingPage> {
               onPressed: _confirmBooking,
               child: const Text('Confirm Booking'),
             ),
-            if (remainingTime != null)
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Text(
-                  'Time Remaining: ${remainingTime!.inMinutes}:${(remainingTime!.inSeconds % 60).toString().padLeft(2, '0')}',
-                  style: const TextStyle(fontSize: 16, color: Colors.red),
-                ),
-              ),
           ],
         ),
       ),
