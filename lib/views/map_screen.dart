@@ -87,7 +87,8 @@ class _MapScreenState extends State<MapScreen> {
           'id': doc.id,
           'name': doc['name'],
           'spaces': spacesCount,
-          'position': position, // Ensure position is a LatLng object
+          'position': position,
+          'image': doc['image'],// Ensure position is a LatLng object
         });
       }
 
@@ -135,6 +136,9 @@ class _MapScreenState extends State<MapScreen> {
 
   void _showBottomSheet(Map<String, dynamic> spot) async {
     final String placeName = await _getPlaceName(spot['position']);
+
+    print('Spot Data: $spot');
+    print('Image URL: ${spot['image']}');
     final LatLng currentLatLng = LatLng(
       _currentLocation?.latitude ?? 0.0,
       _currentLocation?.longitude ?? 0.0,
@@ -148,62 +152,191 @@ class _MapScreenState extends State<MapScreen> {
       ),
       builder: (context) {
         return SingleChildScrollView(
-          child: Padding(
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            ),
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  spot['name'],
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Place: $placeName',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Coordinates: (${spot['position'].latitude}, ${spot['position'].longitude})',
-                  style: const TextStyle(fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Available Spaces: ${spot['spaces']}',
-                  style: const TextStyle(fontSize: 16, color: Colors.green),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Distance: ${distance.toStringAsFixed(2)} km',
-                  style: const TextStyle(fontSize: 16, color: Colors.blue),
+                // Spot Name
+                Center(
+                  child: Text(
+                    spot['name'],
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () => _navigateToParkingSpot(spot['position']),
-                  child: const Text('Navigate to Parking Spot'),
+                // Spot Details
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, color: Colors.black54),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Place: $placeName',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.map, color: Colors.black54),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Coordinates: (${spot['position'].latitude.toStringAsFixed(4)}, ${spot['position'].longitude.toStringAsFixed(4)})',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.event_seat, color: Colors.black54),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Available Spaces: ${spot['spaces']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.directions_walk, color: Colors.black54),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Distance: ${distance.toStringAsFixed(2)} km',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                spot['image'] != null
-                    ? Image.network(
-                  spot['image'],
+
+                // Spot Image
+            Center(
+              child: spot['image'] != null && spot['image'].toString().isNotEmpty
+                  ? ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  Uri.encodeFull(spot['image']), // Ensure proper URL encoding
                   height: 200,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                )
-                    : const Text('No image available'),
-                const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    // Implement booking logic here
-                    ///Navigator.push(context, MaterialPageRoute(builder: (context) => BookingPage(parkingSpotId:spot['id'],parkingSpotName: spot['name']??'Unnamed Spot', parkingImage: spot['image']??'')));
-                    Navigator.push(context, MaterialPageRoute(
-                      builder: (context) => ParkingSlotScreen(
-                        parkingSpotId: spot['id'], // Pass ID dynamically
+                  loadingBuilder: (context, child, loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                            (loadingProgress.expectedTotalBytes ?? 1)
+                            : null,
                       ),
-                    ));
+                    );
                   },
-                  child: const Text('Book Now'),
+                  errorBuilder: (context, error, stackTrace) {
+                    print('Error loading image: $error'); // Debugging print
+                    return Container(
+                      height: 200,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'Error loading image',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black45,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              )
+                  : Container(
+                height: 200,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.green.shade100,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Center(
+                  child: Text(
+                    'No image available',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black45,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+                // Buttons
+                ElevatedButton.icon(
+                  onPressed: () => _navigateToParkingSpot(spot['position']),
+                  icon: const Icon(Icons.navigation, color: Colors.white),
+                  label: const Text('Navigate'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade500,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 13),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ParkingSlotScreen(
+                          parkingSpotId: spot['id'], // Pass ID dynamically
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.book_online, color: Colors.white),
+                  label: const Text('Book Now'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade500,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12,horizontal: 13),
+                    textStyle: const TextStyle(fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -212,6 +345,7 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
   }
+
 
   Future<void> _navigateToParkingSpot(LatLng destination) async {
     final String googleMapsUrl = 'google.navigation:q=${destination.latitude},${destination.longitude}';
@@ -239,7 +373,7 @@ class _MapScreenState extends State<MapScreen> {
     return Scaffold(
       appBar: AppBar(
         elevation: 10,
-        backgroundColor: Colors.green.shade100,
+        backgroundColor: Colors.lightBlueAccent.shade100,
         title: Center(
           child: ImageIcon(
             AssetImage('assets/images/Black.png'),

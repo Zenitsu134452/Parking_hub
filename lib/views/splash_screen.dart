@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green.shade100,
+      backgroundColor: Colors.lightBlueAccent,
       body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

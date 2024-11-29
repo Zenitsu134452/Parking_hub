@@ -111,7 +111,9 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Book Space ${widget.spaceId}')),
+      appBar: AppBar(
+          backgroundColor:Colors.lightBlueAccent,
+          title: Text('Book Space ${widget.spaceId}')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

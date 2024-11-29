@@ -10,38 +10,48 @@ class ProfilePage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Profile"),
+        backgroundColor: Colors.lightBlueAccent,
+        leading: Icon(Icons.person),
+        title: Text("Profile"),
         scrolledUnderElevation: 0,
       ),
       body: Column(
         children: [
-          ListTile(
-            title: Text(userProvider.name),
-            subtitle: Text(userProvider.email.isNotEmpty
-                ? userProvider.email
-                : "No Email"),
-            trailing: const Icon(Icons.edit_outlined),
-            onTap: () {
-              Navigator.pushNamed(context, "/update_profile");
-            },
+          Card(
+            child: ListTile(
+              title: Text(userProvider.name),
+              subtitle: Text(userProvider.email.isNotEmpty
+                  ? userProvider.email
+                  : "No Email"),
+              trailing: const Icon(Icons.edit_outlined),
+              onTap: () {
+                Navigator.pushNamed(context, "/update_profile");
+              },
+            ),
           ),
-          ListTile(
-            title: const Text("Phone no"),
-            subtitle: Text(userProvider.phone.isNotEmpty
-                ? userProvider.phone
-                : "No Phone no"),
+          Card(
+            child: ListTile(
+              title: const Text("Phone no"),
+              subtitle: Text(userProvider.phone.isNotEmpty
+                  ? userProvider.phone
+                  : "No Phone no"),
+            ),
           ),
-          ListTile(
-            title: const Text("Vehicle Number"),
-            subtitle: Text(userProvider.vehicleNumber.isNotEmpty
-                ? userProvider.vehicleNumber
-                : "No Vehicle number"),
+          Card(
+            child: ListTile(
+              title: const Text("Vehicle Number"),
+              subtitle: Text(userProvider.vehicleNumber.isNotEmpty
+                  ? userProvider.vehicleNumber
+                  : "No Vehicle number"),
+            ),
           ),
-          ListTile(
-            title: const Text("Vehicle Type"),
-            subtitle: Text(userProvider.vehicleType.isNotEmpty
-                ? userProvider.vehicleType
-                : "No Vehicle Type"),
+          Card(
+            child: ListTile(
+              title: const Text("Vehicle Type"),
+              subtitle: Text(userProvider.vehicleType.isNotEmpty
+                  ? userProvider.vehicleType
+                  : "No Vehicle Type"),
+            ),
           ),
           SizedBox(height: 20,),
           Divider( thickness: 1,  endIndent:  10, indent: 10,),

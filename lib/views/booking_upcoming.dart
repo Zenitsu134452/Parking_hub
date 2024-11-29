@@ -102,6 +102,8 @@ class _BookingUpcomingState extends State<BookingUpcoming> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightBlueAccent.shade100,
+        leading: Icon(Icons.history),
         title: const Text('Upcoming Bookings'),
       ),
       body: isLoading
