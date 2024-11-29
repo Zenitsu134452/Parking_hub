@@ -1,20 +1,22 @@
-
-class UserModel{
-  String name,email,address,phone;
+class UserModel {
+  String name, email, phone, vehicleNumber, vehicleType;
 
   UserModel({
     required this.name,
-    required this.address,
     required this.email,
-    required this.phone
-});
+    required this.phone,
+    required this.vehicleNumber,
+    required this.vehicleType,
+  });
 
-  // convert json to object model
-  factory UserModel.fromJson(Map<String,dynamic> json){
-    return  UserModel(name:json["name"]??"User",
-        address:json["address"]??"",
-        email:json["email"]??"",
-        phone:json["phone"]??"");
+  // Convert JSON to object model
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      name: json["name"] ?? "User",
+      email: json["email"] ?? "",
+      phone: json["phone"] ?? "",
+      vehicleNumber: json["vehicle_number"] ?? "",
+      vehicleType: json["vehicle_type"] ?? "",
+    );
   }
-
 }

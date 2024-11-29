@@ -28,15 +28,16 @@ class AuthService {
         loadUserData(user.uid); // Reload user data in the provider
 
         DocumentSnapshot userDoc = await FirebaseFirestore.instance
-            .collection("shop_users")
+            .collection("park_users")
             .doc(user.uid)
             .get();
 
         if (!userDoc.exists) {
-          await FirebaseFirestore.instance.collection("shop_users").doc(user.uid).set({
+          await FirebaseFirestore.instance.collection("park_users").doc(user.uid).set({
             "name": "User",
             "email": user.email,
-            "address": "",
+             "vehicle_number":"",
+            "vehicle_type":"",
             "phone": "",
           });
         }
@@ -96,6 +97,21 @@ class AuthService {
       return e.message.toString();
     }
   }
+  Future<void> initializeUserDocument(String userId) async {
+    final docRef = FirebaseFirestore.instance.collection("park_users").doc(userId);
+    final docSnapshot = await docRef.get();
+
+    if (!docSnapshot.exists) {
+      await docRef.set({
+        "name": "User",
+        "email": FirebaseAuth.instance.currentUser?.email ?? "",
+        "phone": "",
+        "vehicle_number": "",
+        "vehicle_type": "",
+      });
+    }
+  }
+
 
   // Send email verification
   Future<void> sendEmailVerification() async {

@@ -3,14 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-
 class UserProvider extends ChangeNotifier {
   StreamSubscription<DocumentSnapshot>? _userSubscription;
 
   String name = "User";
   String email = "";
-  String address = "";
   String phone = "";
+  String vehicleNumber = "";
+  String vehicleType = "";
+
   UserProvider() {
     _initializeUser();
   }
@@ -27,7 +28,7 @@ class UserProvider extends ChangeNotifier {
   void loadUserData(String userId) {
     _userSubscription?.cancel();
     _userSubscription = FirebaseFirestore.instance
-        .collection("shop_users")
+        .collection("park_users")
         .doc(userId)
         .snapshots()
         .listen((snapshot) {
@@ -35,8 +36,9 @@ class UserProvider extends ChangeNotifier {
         final data = snapshot.data() as Map<String, dynamic>;
         name = data["name"] ?? "User";
         email = data["email"] ?? "";
-        address = data["address"] ?? "";
         phone = data["phone"] ?? "";
+        vehicleNumber = data["vehicle_number"] ?? "";
+        vehicleType = data["vehicle_type"] ?? "";
       } else {
         resetUserData();
       }
@@ -44,12 +46,37 @@ class UserProvider extends ChangeNotifier {
     });
   }
 
+  // Update user data
+  Future<void> updateUserData(Map<String, dynamic> updatedData) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      final docRef = FirebaseFirestore.instance.collection("park_users").doc(user.uid);
+
+      try {
+        // Check if the document exists
+        final docSnapshot = await docRef.get();
+        if (docSnapshot.exists) {
+          // If document exists, update it
+          await docRef.update(updatedData);
+        } else {
+          // If document doesn't exist, create it with the updated data
+          await docRef.set(updatedData);
+        }
+      } catch (e) {
+        print("Error updating user data: $e");
+        throw e;
+      }
+    }
+  }
+
+
   // Reset user data (used during logout)
   void resetUserData() {
     name = "User";
     email = "";
-    address = "";
     phone = "";
+    vehicleNumber = "";
+    vehicleType = "";
     notifyListeners();
   }
 

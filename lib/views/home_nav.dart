@@ -1,3 +1,6 @@
+import 'package:easy_map/views/booking_upcoming.dart';
+import 'package:easy_map/views/map_screen.dart';
+import 'package:easy_map/views/profile_page.dart';
 import 'package:flutter/material.dart';
 
 class HomeNav extends StatefulWidget {
@@ -12,9 +15,9 @@ class _HomeNavState extends State<HomeNav> {
 
   // Define screens for the tabs
   final List<Widget> _screens = [
-    const Center(child: Text('Map Screen')),
-    const Center(child: Text('Profile Screen')),
-    const Center(child: Text('Bookings Screen')),
+    MapScreen(),
+    ProfilePage(),
+   BookingUpcoming(),
   ];
 
   void _onItemTapped(int index) {
